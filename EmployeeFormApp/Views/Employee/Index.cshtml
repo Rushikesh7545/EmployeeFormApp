@@ -1,0 +1,91 @@
+﻿@model EmployeeFormApp.Models.Employee
+
+@{
+    ViewData["Title"] = "Employee Form";
+    var employees = ViewBag.Employees as IEnumerable<Employee>;
+}
+
+<h1>Employee Form</h1>
+
+<form asp-action="Save" method="post">
+    <div class="form-group">
+        <label asp-for="EmployeeCode"></label>
+        <input asp-for="EmployeeCode" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="EmployeeName"></label>
+        <input asp-for="EmployeeName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DateOfBirth"></label>
+        <input asp-for="DateOfBirth" class="form-control" type="date" />
+    </div>
+    <div class="form-group">
+        <label>Gender</label><br />
+        <input type="radio" asp-for="Gender" value="true" /> Male
+        <input type="radio" asp-for="Gender" value="false" /> Female
+    </div>
+    <div class="form-group">
+        <label asp-for="Department"></label>
+        <input asp-for="Department" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Designation"></label>
+        <input asp-for="Designation" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="BasicSalary"></label>
+        <input asp-for="BasicSalary" class="form-control" type="number" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save Employee</button>
+</form>
+
+<h2>Employee List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Employee Code</th>
+            <th>Employee Name</th>
+            <th>Date of Birth</th>
+            <th>Gender</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Basic Salary</th>
+            <th>Dearness Allowance</th>
+            <th>Conveyance Allowance</th>
+            <th>House Rent Allowance</th>
+            <th>PT</th>
+            <th>Total Salary</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in employees)
+        {
+            var da = employee.BasicSalary * 0.4f;
+            var ca = Math.Min(da * 0.1f, 250);
+            var hra = Math.Max(employee.BasicSalary * 0.25f, 1500);
+            var grossSalary = employee.BasicSalary + da + ca + hra;
+            var pt = grossSalary <= 3000 ? 100 : (grossSalary <= 6000 ? 150 : 200);
+            var totalSalary = grossSalary - pt;
+
+            <tr>
+                <td>@employee.EmployeeCode</td>
+                <td>@employee.EmployeeName</td>
+                <td>@employee.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                <td>@(employee.Gender ? "Male" : "Female")</td>
+                <td>@employee.Department</td>
+                <td>@employee.Designation</td>
+                <td>@employee.BasicSalary.ToString("C")</td>
+                <td>@da.ToString("C")</td>
+                <td>@ca.ToString("C")</td>
+                <td>@hra.ToString("C")</td>
+                <td>@pt</td>
+                <td>@totalSalary.ToString("C")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@employee.EmployeeCode" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
